@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ai-sdk/gateway": "^4.0.132",
+    "@ai-sdk/google": "^4.0.109",
     "@vercel/oidc": "^4.0.5",
     "ai": "^7.0.159",
     "next": "16.4.3",

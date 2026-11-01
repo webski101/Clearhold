@@ -25,9 +25,12 @@ When money lands in PayPal and gets stuck in review, Clearhold helps recipients 
 - Vercel AI SDK for structured hold diagnosis
 - PayPal REST APIs: OAuth, Invoicing, Payouts, status
 
-**AI is free in production** via [Vercel AI Gateway](https://vercel.com/docs/ai-gateway) free models (`nvidia/nemotron-3.5-lightning-free`) authenticated with Vercel OIDC — no paid OpenAI key.
+**Free AI options**
 
-Without gateway access (local without a key), diagnosis falls back to a built-in demo engine. PayPal invoice/payout stays in demo until you add sandbox credentials.
+1. **Google AI Studio (recommended, no card):** set `GOOGLE_GENERATIVE_AI_API_KEY` from [aistudio.google.com/apikey](https://aistudio.google.com/apikey)
+2. **Vercel AI Gateway free models:** work at $0, but Vercel requires a card on the team first
+
+Without either, diagnosis uses a built-in demo engine. PayPal invoice/payout stays in demo until you add sandbox credentials.
 
 ## Quick start
 
@@ -43,9 +46,8 @@ Open [http://localhost:3000](http://localhost:3000).
 Copy `.env.example` to `.env.local`:
 
 ```bash
-# Local free AI via AI Gateway (production on Vercel needs no key)
-AI_GATEWAY_API_KEY=
-AI_MODEL=nvidia/nemotron-3.5-lightning-free
+GOOGLE_GENERATIVE_AI_API_KEY=
+GOOGLE_MODEL=gemini-2.0-flash
 
 PAYPAL_CLIENT_ID=
 PAYPAL_CLIENT_SECRET=

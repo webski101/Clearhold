@@ -1,5 +1,6 @@
 import { generateText, Output } from "ai";
 import { gateway } from "@ai-sdk/gateway";
+import { google } from "@ai-sdk/google";
 import { z } from "zod";
 import type { DiagnosisResult, DiagnoseRequest } from "@/lib/types";
 import { demoDiagnose } from "@/lib/ai/demo-diagnose";
@@ -30,20 +31,7 @@ const diagnosisSchema = z.object({
   }),
 });
 
-/** Free-tier models on Vercel AI Gateway ($0 input / $0 output). */
-const FREE_MODELS = [
-  process.env.AI_MODEL,
-  "nvidia/nemotron-3.5-lightning-free",
-  "reflection/beam-free",
-].filter(Boolean) as string[];
-
-function canUseGateway() {
-  return Boolean(
-    process.env.VERCEL_OIDC_TOKEN ||
-      process.env.AI_GATEWAY_API_KEY ||
-      process.env.VERCEL,
-  );
-}
+type ModelRunner = { id: string; model: Parameters<typeof generateText>[0]["model"] };
 
 function buildPrompt(req: DiagnoseRequest) {
   return `You help people resolve PayPal payment holds and limitations — especially international inbound payments.
@@ -85,6 +73,35 @@ function parseJsonResult(text: string): DiagnosisResult | null {
   }
 }
 
+function freeModels(): ModelRunner[] {
+  const models: ModelRunner[] = [];
+
+  // Google AI Studio free tier — no credit card required in most regions.
+  if (process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+    models.push({
+      id: "google/gemini-2.0-flash",
+      model: google(process.env.GOOGLE_MODEL || "gemini-2.0-flash"),
+    });
+  }
+
+  // Vercel AI Gateway free models — needs a card on the Vercel team (charges stay $0).
+  if (
+    process.env.VERCEL_OIDC_TOKEN ||
+    process.env.AI_GATEWAY_API_KEY ||
+    process.env.VERCEL
+  ) {
+    for (const id of [
+      process.env.AI_MODEL,
+      "nvidia/nemotron-3.5-lightning-free",
+      "reflection/beam-free",
+    ].filter(Boolean) as string[]) {
+      models.push({ id, model: gateway(id) });
+    }
+  }
+
+  return models;
+}
+
 export async function diagnoseHold(
   req: DiagnoseRequest,
 ): Promise<{
@@ -92,20 +109,20 @@ export async function diagnoseHold(
   mode: "ai" | "demo";
   fallbackReason?: string;
 }> {
-  if (!canUseGateway()) {
+  const models = freeModels();
+  if (models.length === 0) {
     return {
       result: demoDiagnose(req),
       mode: "demo",
-      fallbackReason: "No AI Gateway auth in this environment",
+      fallbackReason:
+        "Add a free Google AI Studio key (GOOGLE_GENERATIVE_AI_API_KEY) or unlock Vercel AI Gateway free models",
     };
   }
 
   const prompt = buildPrompt(req);
   const errors: string[] = [];
 
-  for (const modelId of FREE_MODELS) {
-    const model = gateway(modelId);
-
+  for (const { id, model } of models) {
     try {
       const structured = await generateText({
         model,
@@ -115,10 +132,10 @@ export async function diagnoseHold(
       if (structured.output) {
         return { result: structured.output, mode: "ai" };
       }
-      errors.push(`${modelId}: structured output empty`);
+      errors.push(`${id}: structured output empty`);
     } catch (error) {
       errors.push(
-        `${modelId} structured: ${error instanceof Error ? error.message : String(error)}`,
+        `${id} structured: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
 
@@ -128,10 +145,10 @@ export async function diagnoseHold(
       if (parsed) {
         return { result: parsed, mode: "ai" };
       }
-      errors.push(`${modelId}: plain JSON parse failed`);
+      errors.push(`${id}: plain JSON parse failed`);
     } catch (error) {
       errors.push(
-        `${modelId} plain: ${error instanceof Error ? error.message : String(error)}`,
+        `${id} plain: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
   }
