@@ -31,7 +31,10 @@ const diagnosisSchema = z.object({
   }),
 });
 
-type ModelRunner = { id: string; model: Parameters<typeof generateText>[0]["model"] };
+type ModelRunner = {
+  id: string;
+  model: Parameters<typeof generateText>[0]["model"];
+};
 
 function buildPrompt(req: DiagnoseRequest) {
   return `You help people resolve PayPal payment holds and limitations — especially international inbound payments.
@@ -76,15 +79,16 @@ function parseJsonResult(text: string): DiagnosisResult | null {
 function freeModels(): ModelRunner[] {
   const models: ModelRunner[] = [];
 
-  // Google AI Studio free tier — no credit card required in most regions.
+  // Google AI Studio free tier — prefer a fast lite model.
   if (process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
     models.push({
-      id: "google/gemini-flash",
-      model: google(process.env.GOOGLE_MODEL || "gemini-3.8-flash"),
+      id: "google/gemini-flash-lite",
+      model: google(process.env.GOOGLE_MODEL || "gemini-3.5-flash-lite"),
     });
+    return models;
   }
 
-  // Vercel AI Gateway free models — needs a card on the Vercel team (charges stay $0).
+  // Vercel AI Gateway free models — needs a card on the Vercel team (usage stays $0).
   if (
     process.env.VERCEL_OIDC_TOKEN ||
     process.env.AI_GATEWAY_API_KEY ||
@@ -123,24 +127,13 @@ export async function diagnoseHold(
   const errors: string[] = [];
 
   for (const { id, model } of models) {
+    // Plain JSON first — faster and more reliable on free lite models.
     try {
-      const structured = await generateText({
+      const plain = await generateText({
         model,
-        output: Output.object({ schema: diagnosisSchema }),
         prompt,
+        abortSignal: AbortSignal.timeout(25000),
       });
-      if (structured.output) {
-        return { result: structured.output, mode: "ai" };
-      }
-      errors.push(`${id}: structured output empty`);
-    } catch (error) {
-      errors.push(
-        `${id} structured: ${error instanceof Error ? error.message : String(error)}`,
-      );
-    }
-
-    try {
-      const plain = await generateText({ model, prompt });
       const parsed = parseJsonResult(plain.text);
       if (parsed) {
         return { result: parsed, mode: "ai" };
@@ -149,6 +142,23 @@ export async function diagnoseHold(
     } catch (error) {
       errors.push(
         `${id} plain: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
+
+    try {
+      const structured = await generateText({
+        model,
+        output: Output.object({ schema: diagnosisSchema }),
+        prompt,
+        abortSignal: AbortSignal.timeout(25000),
+      });
+      if (structured.output) {
+        return { result: structured.output, mode: "ai" };
+      }
+      errors.push(`${id}: structured output empty`);
+    } catch (error) {
+      errors.push(
+        `${id} structured: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
   }
