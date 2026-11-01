@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
+import { ModeProvider } from "@/lib/mode";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -28,9 +29,11 @@ export default function RootLayout({
         />
       </head>
       <body className="flex min-h-full flex-col antialiased">
-        <SiteHeader />
-        <main className="relative z-10 flex-1">{children}</main>
-        <SiteFooter />
+        <ModeProvider>
+          <SiteHeader />
+          <main className="relative z-10 flex-1">{children}</main>
+          <SiteFooter />
+        </ModeProvider>
       </body>
     </html>
   );

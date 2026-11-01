@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { FadeIn, ModePill } from "@/components/ui";
+import { useAppMode } from "@/lib/mode";
 
 type PaymentKind =
   | "freelance_service"
@@ -12,6 +13,7 @@ type PaymentKind =
   | "unknown";
 
 export function SendClient() {
+  const { forceDemo } = useAppMode();
   const [recipientEmail, setRecipientEmail] = useState("recipient@example.com");
   const [recipientName, setRecipientName] = useState("Alex Recipient");
   const [amount, setAmount] = useState("2500");
@@ -63,6 +65,7 @@ export function SendClient() {
           currency,
           purpose,
           lineItem,
+          forceDemo,
         }),
       });
       const data = await res.json();
@@ -89,6 +92,7 @@ export function SendClient() {
           purpose,
           note,
           paymentKind,
+          forceDemo,
         }),
       });
       const data = await res.json();
@@ -113,7 +117,11 @@ export function SendClient() {
     if (!batch) return;
     setLoading("payout");
     try {
-      const res = await fetch(`/api/paypal/status?batchId=${encodeURIComponent(batch)}`);
+      const res = await fetch(
+        `/api/paypal/status?batchId=${encodeURIComponent(batch)}${
+          forceDemo ? "&forceDemo=1" : ""
+        }`,
+      );
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Status failed");
       setStatusResult(data);

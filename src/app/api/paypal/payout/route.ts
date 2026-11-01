@@ -14,12 +14,14 @@ export async function POST(request: Request) {
       currency = "USD",
       purpose,
       note,
+      forceDemo,
     } = body as {
       recipientEmail?: string;
       amount?: string;
       currency?: string;
       purpose?: string;
       note?: string;
+      forceDemo?: boolean;
     };
 
     if (!recipientEmail || !amount || !purpose) {
@@ -29,7 +31,7 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!paypalConfigured()) {
+    if (forceDemo || !paypalConfigured()) {
       return NextResponse.json(
         demoPayoutResponse({
           recipientEmail,

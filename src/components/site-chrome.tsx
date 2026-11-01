@@ -1,8 +1,9 @@
 import Link from "next/link";
+import { ModeToggle } from "@/components/mode-toggle";
 
 export function SiteHeader() {
   return (
-    <header className="relative z-20 flex items-center justify-between px-6 py-5 sm:px-8 lg:px-12">
+    <header className="relative z-20 flex items-center justify-between gap-3 px-6 py-5 sm:px-8 lg:px-12">
       <Link href="/" className="flex items-center gap-2.5">
         <span
           aria-hidden
@@ -15,10 +16,11 @@ export function SiteHeader() {
           Clearhold
         </span>
       </Link>
-      <nav className="flex items-center gap-1 sm:gap-2">
+      <nav className="flex items-center gap-2 sm:gap-3">
+        <ModeToggle />
         <Link
           href="/resolve"
-          className="rounded-lg px-3 py-2 text-[14px] text-[var(--ink-2)] transition hover:bg-[var(--raised)] hover:text-[var(--ink)]"
+          className="hidden rounded-lg px-3 py-2 text-[14px] text-[var(--ink-2)] transition hover:bg-[var(--raised)] hover:text-[var(--ink)] sm:inline"
         >
           Unstick funds
         </Link>
@@ -35,7 +37,7 @@ export function SiteFooter() {
     <footer className="mt-auto border-t border-[var(--line)] px-6 py-8 text-[13px] text-[var(--ink-3)] sm:px-8 lg:px-12">
       <div className="mx-auto flex max-w-6xl flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <p>Clearhold helps clear held PayPal payments with documentation</p>
-        <p className="mono">Demo mode works without API keys</p>
+        <p className="mono">Use Live / Demo in the header for your video</p>
       </div>
     </footer>
   );

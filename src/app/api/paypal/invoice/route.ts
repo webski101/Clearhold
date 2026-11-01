@@ -15,6 +15,7 @@ export async function POST(request: Request) {
       currency = "USD",
       purpose,
       lineItem,
+      forceDemo,
     } = body as {
       recipientEmail?: string;
       recipientName?: string;
@@ -22,6 +23,7 @@ export async function POST(request: Request) {
       currency?: string;
       purpose?: string;
       lineItem?: string;
+      forceDemo?: boolean;
     };
 
     if (!recipientEmail || !amount || !purpose) {
@@ -33,7 +35,7 @@ export async function POST(request: Request) {
 
     const itemName = lineItem || purpose;
 
-    if (!paypalConfigured()) {
+    if (forceDemo || !paypalConfigured()) {
       return NextResponse.json(
         demoInvoiceResponse({
           recipientEmail,

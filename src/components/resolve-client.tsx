@@ -3,12 +3,14 @@
 import { FormEvent, useState, type ReactNode } from "react";
 import type { DiagnosisResult } from "@/lib/types";
 import { FadeIn, ModePill, RiskBadge } from "@/components/ui";
+import { useAppMode } from "@/lib/mode";
 
 const SAMPLE_NOTICE = `Your PayPal payment of $2,500.00 USD from an international sender is temporarily held for review.
 Please explain how you received this money and provide supporting documents.
 Transaction appears unusual for your account activity.`;
 
 export function ResolveClient() {
+  const { forceDemo } = useAppMode();
   const [holdNotice, setHoldNotice] = useState(SAMPLE_NOTICE);
   const [amount, setAmount] = useState("2500");
   const [currency, setCurrency] = useState("USD");
@@ -40,6 +42,7 @@ export function ResolveClient() {
           recipientCountry,
           relationship,
           context,
+          forceDemo,
         }),
       });
       const data = await res.json();

@@ -4,12 +4,13 @@ import { paypalConfigured, paypalFetch } from "@/lib/paypal/client";
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const batchId = searchParams.get("batchId");
+  const forceDemo = searchParams.get("forceDemo") === "1";
 
   if (!batchId) {
     return NextResponse.json({ error: "batchId is required" }, { status: 400 });
   }
 
-  if (batchId.startsWith("DEMO-") || !paypalConfigured()) {
+  if (forceDemo || batchId.startsWith("DEMO-") || !paypalConfigured()) {
     return NextResponse.json({
       mode: "demo",
       batch_header: {
