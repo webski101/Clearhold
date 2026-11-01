@@ -47,7 +47,7 @@ Copy `.env.example` to `.env.local`:
 
 ```bash
 GOOGLE_GENERATIVE_AI_API_KEY=
-GOOGLE_MODEL=gemini-2.0-flash
+GOOGLE_MODEL=gemini-3.8-flash
 
 PAYPAL_CLIENT_ID=
 PAYPAL_CLIENT_SECRET=

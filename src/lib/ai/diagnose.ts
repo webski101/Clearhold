@@ -79,8 +79,8 @@ function freeModels(): ModelRunner[] {
   // Google AI Studio free tier — no credit card required in most regions.
   if (process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
     models.push({
-      id: "google/gemini-2.0-flash",
-      model: google(process.env.GOOGLE_MODEL || "gemini-2.0-flash"),
+      id: "google/gemini-flash",
+      model: google(process.env.GOOGLE_MODEL || "gemini-3.8-flash"),
     });
   }
 
