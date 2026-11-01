@@ -46,7 +46,11 @@ export function RiskBadge({ level }: { level: "low" | "medium" | "high" }) {
 
 export function ModePill({ mode }: { mode: "ai" | "demo" | "paypal" }) {
   const label =
-    mode === "ai" ? "Live AI" : mode === "paypal" ? "PayPal sandbox" : "Demo engine";
+    mode === "ai"
+      ? "Free AI"
+      : mode === "paypal"
+        ? "PayPal sandbox"
+        : "Demo engine";
   return (
     <span className="mono inline-flex items-center gap-1.5 rounded-md border border-[var(--line)] bg-[var(--bg)] px-2 py-1 text-[12px] text-[var(--ink-3)]">
       <span
