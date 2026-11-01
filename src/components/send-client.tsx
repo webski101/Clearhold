@@ -144,7 +144,7 @@ export function SendClient() {
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium text-[var(--ink)]">
+              <label className="mb-2 block text-[14px] font-medium text-[var(--ink)]">
               Payment type
             </label>
             <select
@@ -162,7 +162,7 @@ export function SendClient() {
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium text-[var(--ink)]">
+            <label className="mb-2 block text-[14px] font-medium text-[var(--ink)]">
               Purpose (shown on docs / payout)
             </label>
             <textarea
@@ -205,10 +205,13 @@ export function SendClient() {
       <div className="space-y-4">
         <FadeIn delay={80}>
           <div className="panel p-6">
-            <h2 className="font-[family-name:var(--font-display)] text-2xl text-[var(--ink)]">
+            <h2
+              className="text-[24px] leading-8 text-[var(--ink)]"
+              style={{ fontFamily: "var(--font-display)", fontWeight: 400 }}
+            >
               Why this reduces holds
             </h2>
-            <ul className="mt-4 space-y-3 text-sm leading-relaxed text-[var(--muted)]">
+            <ul className="mt-4 space-y-3 text-[14px] leading-6 text-[var(--ink-2)]">
               <li>Explicit purpose note instead of a blank transfer</li>
               <li>Invoice trail that matches amount and currency</li>
               <li>Payment kind labeled before money moves</li>
@@ -267,7 +270,7 @@ function Labeled({
 }) {
   return (
     <div>
-      <label className="mb-2 block text-sm font-medium text-[var(--ink)]">
+      <label className="mb-2 block text-[14px] font-medium text-[var(--ink)]">
         {label}
       </label>
       <input className="field" value={value} onChange={(e) => onChange(e.target.value)} />
@@ -287,12 +290,10 @@ function ResultPanel({
   return (
     <div className="panel p-5">
       <div className="mb-3 flex items-center justify-between gap-3">
-        <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">
-          {title}
-        </h3>
+        <h3 className="text-[13px] font-medium text-[var(--ink-3)]">{title}</h3>
         <ModePill mode={mode} />
       </div>
-      <pre className="max-h-80 overflow-auto rounded-md bg-[var(--foam)] p-3 text-xs leading-relaxed text-[var(--ink)]">
+      <pre className="mono max-h-80 overflow-auto rounded-lg bg-[var(--bg)] p-3 text-[12px] leading-5 text-[var(--ink)]">
         {JSON.stringify(body, null, 2)}
       </pre>
     </div>

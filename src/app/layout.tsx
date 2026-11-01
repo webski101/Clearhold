@@ -5,7 +5,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Clearhold — Unstick held PayPal payments",
   description:
-    "AI co-pilot that diagnoses PayPal payment holds, drafts support replies, builds document packs, and helps senders pay with clearer PayPal invoices and payouts.",
+    "Diagnose PayPal payment holds, draft support replies, build document packs, and send clearer invoices and payouts.",
 };
 
 export default function RootLayout({
@@ -23,11 +23,11 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
         <link
-          href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap"
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-full flex flex-col antialiased">
+      <body className="flex min-h-full flex-col antialiased">
         <SiteHeader />
         <main className="relative z-10 flex-1">{children}</main>
         <SiteFooter />

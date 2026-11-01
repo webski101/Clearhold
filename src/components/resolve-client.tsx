@@ -65,7 +65,7 @@ export function ResolveClient() {
       <FadeIn>
         <form onSubmit={onSubmit} className="space-y-5">
           <div>
-            <label className="mb-2 block text-sm font-medium text-[var(--ink)]">
+              <label className="mb-2 block text-[14px] font-medium text-[var(--ink)]">
               Hold notice / case text
             </label>
             <textarea
@@ -98,7 +98,7 @@ export function ResolveClient() {
             onChange={setRelationship}
           />
           <div>
-            <label className="mb-2 block text-sm font-medium text-[var(--ink)]">
+            <label className="mb-2 block text-[14px] font-medium text-[var(--ink)]">
               Extra context
             </label>
             <textarea
@@ -124,15 +124,18 @@ export function ResolveClient() {
       <div className="space-y-4">
         {!result ? (
           <FadeIn delay={120}>
-            <div className="panel p-6 text-[var(--muted)]">
-              <p className="font-[family-name:var(--font-display)] text-2xl text-[var(--ink)]">
+            <div className="panel p-6 text-[var(--ink-2)]">
+              <p
+                className="text-[24px] leading-8 text-[var(--ink)]"
+                style={{ fontFamily: "var(--font-display)", fontWeight: 400 }}
+              >
                 What you get
               </p>
-              <ul className="mt-4 space-y-3 text-sm leading-relaxed">
+              <ul className="mt-4 space-y-3 text-[14px] leading-6">
                 <li>Likely cause of the hold</li>
-                <li>Document checklist tailored to the payment type</li>
+                <li>Document checklist for the payment type</li>
                 <li>Ready-to-send PayPal reply draft</li>
-                <li>Advice so future senders don’t trigger the same delay</li>
+                <li>Advice so future senders reduce the same delay</li>
               </ul>
             </div>
           </FadeIn>
@@ -142,22 +145,25 @@ export function ResolveClient() {
               <div className="flex flex-wrap items-center gap-2">
                 <RiskBadge level={result.riskLevel} />
                 {mode ? <ModePill mode={mode} /> : null}
-                <span className="text-xs text-[var(--muted)]">
-                  {Math.round(result.confidence * 100)}% confidence ·{" "}
+                <span className="mono text-[12px] text-[var(--ink-3)]">
+                  {Math.round(result.confidence * 100)}% ·{" "}
                   {result.paymentKind.replaceAll("_", " ")}
                 </span>
               </div>
               <div>
-                <h2 className="font-[family-name:var(--font-display)] text-2xl text-[var(--ink)]">
+                <h2
+                  className="text-[24px] leading-8 text-[var(--ink)]"
+                  style={{ fontFamily: "var(--font-display)", fontWeight: 400 }}
+                >
                   {result.summary}
                 </h2>
-                <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">
+                <p className="mt-2 text-[14px] leading-6 text-[var(--ink-2)]">
                   {result.likelyCause}
                 </p>
               </div>
 
               <Section title="Next steps">
-                <ol className="list-decimal space-y-2 pl-5 text-sm">
+                <ol className="list-decimal space-y-2 pl-5 text-[14px] leading-6 text-[var(--ink)]">
                   {result.nextSteps.map((step) => (
                     <li key={step}>{step}</li>
                   ))}
@@ -168,8 +174,8 @@ export function ResolveClient() {
                 <ul className="space-y-2 text-sm">
                   {result.checklist.map((item) => (
                     <li key={item} className="flex gap-2">
-                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]" />
-                      <span>{item}</span>
+                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--held)]" />
+                      <span className="text-[14px] leading-6 text-[var(--ink)]">{item}</span>
                     </li>
                   ))}
                 </ul>
@@ -183,25 +189,25 @@ export function ResolveClient() {
                   </button>
                 }
               >
-                <pre className="whitespace-pre-wrap rounded-md bg-[var(--foam)] p-3 text-xs leading-relaxed text-[var(--ink)]">
+                <pre className="whitespace-pre-wrap rounded-lg bg-[var(--bg)] p-3 text-[12px] leading-5 text-[var(--ink)]">
                   {result.replyDraft}
                 </pre>
               </Section>
 
               <Section title="Invoice / award outline">
-                <p className="text-sm font-medium text-[var(--ink)]">
+                <p className="text-[14px] font-medium text-[var(--ink)]">
                   {result.invoiceOutline.title}
                 </p>
-                <p className="mt-1 text-sm text-[var(--muted)]">
+                <p className="mt-1 text-[14px] leading-6 text-[var(--ink-2)]">
                   {result.invoiceOutline.description}
                 </p>
-                <p className="mt-2 text-sm">
-                  Line item: <strong>{result.invoiceOutline.lineItem}</strong>
+                <p className="mt-2 text-[14px] text-[var(--ink)]">
+                  Line item: {result.invoiceOutline.lineItem}
                 </p>
               </Section>
 
               <Section title="Tell future senders">
-                <ul className="space-y-2 text-sm text-[var(--muted)]">
+                <ul className="space-y-2 text-[14px] leading-6 text-[var(--ink-2)]">
                   {result.senderAdvice.map((tip) => (
                     <li key={tip}>• {tip}</li>
                   ))}
@@ -226,7 +232,7 @@ function Field({
 }) {
   return (
     <div>
-      <label className="mb-2 block text-sm font-medium text-[var(--ink)]">
+      <label className="mb-2 block text-[14px] font-medium text-[var(--ink)]">
         {label}
       </label>
       <input
@@ -250,9 +256,7 @@ function Section({
   return (
     <section className="border-t border-[var(--line)] pt-4">
       <div className="mb-2 flex items-center justify-between gap-3">
-        <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">
-          {title}
-        </h3>
+        <h3 className="text-[13px] font-medium text-[var(--ink-3)]">{title}</h3>
         {action}
       </div>
       {children}
