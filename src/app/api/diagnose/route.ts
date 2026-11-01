@@ -12,8 +12,12 @@ export async function POST(request: Request) {
       );
     }
 
-    const { result, mode } = await diagnoseHold(body);
-    return NextResponse.json({ result, mode });
+    const { result, mode, fallbackReason } = await diagnoseHold(body);
+    return NextResponse.json({
+      result,
+      mode,
+      ...(fallbackReason ? { fallbackReason } : {}),
+    });
   } catch (error) {
     return NextResponse.json(
       {

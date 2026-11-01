@@ -1,4 +1,5 @@
 import { generateText, Output } from "ai";
+import { gateway } from "@ai-sdk/gateway";
 import { z } from "zod";
 import type { DiagnosisResult, DiagnoseRequest } from "@/lib/types";
 import { demoDiagnose } from "@/lib/ai/demo-diagnose";
@@ -37,8 +38,6 @@ const FREE_MODELS = [
 ].filter(Boolean) as string[];
 
 function canUseGateway() {
-  // Production on Vercel: OIDC authenticates AI Gateway with no paid key.
-  // Local: set AI_GATEWAY_API_KEY from vercel.com/ai-gateway (still free models).
   return Boolean(
     process.env.VERCEL_OIDC_TOKEN ||
       process.env.AI_GATEWAY_API_KEY ||
@@ -88,14 +87,25 @@ function parseJsonResult(text: string): DiagnosisResult | null {
 
 export async function diagnoseHold(
   req: DiagnoseRequest,
-): Promise<{ result: DiagnosisResult; mode: "ai" | "demo" }> {
+): Promise<{
+  result: DiagnosisResult;
+  mode: "ai" | "demo";
+  fallbackReason?: string;
+}> {
   if (!canUseGateway()) {
-    return { result: demoDiagnose(req), mode: "demo" };
+    return {
+      result: demoDiagnose(req),
+      mode: "demo",
+      fallbackReason: "No AI Gateway auth in this environment",
+    };
   }
 
   const prompt = buildPrompt(req);
+  const errors: string[] = [];
 
-  for (const model of FREE_MODELS) {
+  for (const modelId of FREE_MODELS) {
+    const model = gateway(modelId);
+
     try {
       const structured = await generateText({
         model,
@@ -105,8 +115,11 @@ export async function diagnoseHold(
       if (structured.output) {
         return { result: structured.output, mode: "ai" };
       }
-    } catch {
-      // Free models may not support structured output — try plain JSON next.
+      errors.push(`${modelId}: structured output empty`);
+    } catch (error) {
+      errors.push(
+        `${modelId} structured: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
 
     try {
@@ -115,10 +128,18 @@ export async function diagnoseHold(
       if (parsed) {
         return { result: parsed, mode: "ai" };
       }
-    } catch {
-      // Try next free model.
+      errors.push(`${modelId}: plain JSON parse failed`);
+    } catch (error) {
+      errors.push(
+        `${modelId} plain: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
   }
 
-  return { result: demoDiagnose(req), mode: "demo" };
+  console.error("[clearhold] free AI fallback", errors.join(" | "));
+  return {
+    result: demoDiagnose(req),
+    mode: "demo",
+    fallbackReason: errors[0] || "Free AI models unavailable",
+  };
 }
